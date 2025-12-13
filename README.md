@@ -1,5 +1,5 @@
 <h1 align="center">Dilber Nur Dağ</h1>
-<h3 align="center">Junior Full Stack Developer (.NET • Angular • GIS)</h3>
+<h3 align="center">Junior Full Stack Developer | .NET & Angular | GIS Applications</h3>
 
 <p align="center">
   <img src="https://komarev.com/ghpvc/?username=dilber13&label=Profile%20Views&color=blueviolet&style=flat" />
@@ -47,6 +47,30 @@ I focus on clean code, modular architecture, maintainability, performance and UI
 
 > This stack reflects my professional experience.
 > I work on full stack enterprise systems rather than focusing on a single programming language.
+
+### Frontend
+- Angular (7–15)
+- TypeScript, JavaScript
+- HTML, CSS, SCSS
+- Reactive Forms & Router-based architecture
+- Responsive and user-focused UI development
+
+### Backend
+- .NET Core / .NET 5+ (C#)
+- RESTful API design
+- JWT-based authentication & role management
+- Entity Framework Core
+
+### Database & Data
+- PostgreSQL
+- MS SQL Server
+- Relational data modeling & query optimization
+
+### Supporting & Domain-Specific
+- Python (scripting, experimentation)
+- OpenLayers (GIS & map-based applications)
+- PDF / Excel generation (ExcelJS, html2pdf)
+
 
 ---
 
@@ -99,7 +123,7 @@ BSc — Information Systems & Technologies
     <img src="https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin" />
   </a>
   <a href="https://github.com/dilber13">
-    <img src="https://img.shields.io/badge/GitHub-black?style=for-the-badge&logo=github" />
+    <img src="https://img.shields.io/badge/GitHub-lightpink?style=for-the-badge&logo=github" />
   </a>
 </p>
 
