@@ -123,7 +123,7 @@ BSc — Information Systems & Technologies
     <img src="https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin" />
   </a>
   <a href="https://github.com/dilber13">
-    <img src="https://img.shields.io/badge/GitHub-lightpink?style=for-the-badge&logo=github" />
+    <img src="https://img.shields.io/badge/GitHub-grey?style=for-the-badge&logo=github" />
   </a>
 </p>
 
