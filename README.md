@@ -51,14 +51,23 @@ I focus on clean code, modular architecture, UI/UX principles and long-term main
 ## 📊 GitHub Stats
 
 <p align="center">
-  <img height="170" src="https://github-readme-stats.vercel.app/api?username=dilber13&show_icons=true&theme=tokyonight" />
+  <img height="170"
+       src="https://github-readme-stats.vercel.app/api?username=dilber13&show_icons=true&theme=tokyonight&hide_border=true&hide=issues,prs" />
 </p>
 
-<p align="center">
-  <img height="170" src="https://github-readme-stats.vercel.app/api/top-langs/?username=dilber13&layout=compact&theme=tokyonight" />
-</p>
 
 ---
+
+## 🧰 Core Tech Stack (Professional Experience)
+
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=angular,ts,js,html,css,scss,cs,dotnet,python" /><br/> 
+  <img src="https://skillicons.dev/icons?i=postgres,mysql,git,github,postman,vscode,visualstudio" />
+</p> 
+
+
+---
+
 
 ## 🎓 Education
 
