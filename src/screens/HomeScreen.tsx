@@ -17,117 +17,180 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function HomeScreen() {
   const navigation = useNavigation<Nav>();
-  const {currentVehicle, reports, loadReports, resetSession, dtcCodes, damageAreas} =
-    useExpertizStore();
+  const {
+    currentVehicle, reports, loadReports, resetSession,
+    dtcCodes, damageAreas,
+    motorTest, frenSuspansiyonTest, yanalKaymaTest, guvenlikTest, gorselTest,
+  } = useExpertizStore();
 
-  useEffect(() => {
-    loadReports();
-  }, []);
+  useEffect(() => { loadReports(); }, []);
 
   const recentReports = reports.slice(0, 3);
+
+  // Test tamamlanma durumları
+  const testModules = [
+    {
+      key: 'motor',
+      icon: 'engine',
+      title: 'Motor Mekanik',
+      desc: 'Yağ, soğutma, kayış, egzoz',
+      done: !!motorTest?.tamamlandi,
+      color: '#E67E22',
+      screen: 'MotorMekanik' as const,
+    },
+    {
+      key: 'fren',
+      icon: 'car-brake-abs',
+      title: 'Fren & Süspansiyon',
+      desc: 'Balata, disk, amortisör, alt takım',
+      done: !!frenSuspansiyonTest?.tamamlandi,
+      color: '#E74C3C',
+      screen: 'FrenSuspansiyon' as const,
+    },
+    {
+      key: 'yanal',
+      icon: 'car-traction-control',
+      title: 'Yanal Kayma Testi',
+      desc: 'Ön/arka aks kayma değerleri',
+      done: !!yanalKaymaTest?.tamamlandi,
+      color: '#3498DB',
+      screen: 'YanalKayma' as const,
+    },
+    {
+      key: 'guvenlik',
+      icon: 'airbag',
+      title: 'Airbag & Güvenlik',
+      desc: 'Airbag, emniyet kemeri, koltuklar',
+      done: !!guvenlikTest?.tamamlandi,
+      color: '#9B59B6',
+      screen: 'Guvenlik' as const,
+    },
+    {
+      key: 'gorsel',
+      icon: 'car-outline',
+      title: 'İç & Dış Görsel',
+      desc: 'Camlar, lambalar, iç mekan, bagaj',
+      done: !!gorselTest?.tamamlandi,
+      color: '#27AE60',
+      screen: 'GorselKontrol' as const,
+    },
+    {
+      key: 'kaporta',
+      icon: 'palette',
+      title: 'Kaporta & Boya',
+      desc: 'Boya kalınlığı, hasar bölgeleri',
+      done: damageAreas.length > 0,
+      color: '#F39C12',
+      screen: 'KaportaBoya' as const,
+    },
+    {
+      key: 'obd2',
+      icon: 'bluetooth-connect',
+      title: 'OBD2 / ELM327',
+      desc: 'Motor beyin testi, arıza kodları',
+      done: dtcCodes.length >= 0 && !!useExpertizStore.getState().connectedDevice,
+      color: '#1ABC9C',
+      screen: null,
+    },
+  ];
+
+  const doneCount = testModules.filter(m => m.done).length;
 
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.darkBg} />
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-        {/* Header */}
+        {/* Başlık */}
         <View style={styles.header}>
           <View>
             <Text style={styles.appName}>{APP_NAME}</Text>
             <Text style={styles.subtitle}>Profesyonel Araç Ekspertiz Sistemi</Text>
           </View>
-          <View style={styles.logo}>
-            <Icon name="shield-car" size={36} color={COLORS.primary} />
-          </View>
+          <Icon name="shield-car" size={38} color={COLORS.primary} />
         </View>
 
-        {/* Aktif Araç */}
+        {/* Araç Kartı */}
         {currentVehicle ? (
-          <View style={styles.section}>
-            <SectionTitle icon="car" title="Aktif Araç" />
-            <VehicleCard
-              vehicle={currentVehicle}
-              onEdit={() => navigation.navigate('VehicleForm', {})}
-            />
-          </View>
+          <VehicleCard vehicle={currentVehicle} onEdit={() => navigation.navigate('VehicleForm', {})} />
         ) : (
-          <TouchableOpacity
-            style={styles.addVehicleBtn}
-            onPress={() => navigation.navigate('VehicleForm', {})}
-            activeOpacity={0.8}>
+          <TouchableOpacity style={styles.addVehicleBtn} onPress={() => navigation.navigate('VehicleForm', {})} activeOpacity={0.8}>
             <Icon name="plus-circle-outline" size={28} color={COLORS.primary} />
             <Text style={styles.addVehicleText}>Araç Bilgilerini Gir</Text>
-            <Text style={styles.addVehicleSub}>Ekspertize başlamak için araç bilgilerini ekleyin</Text>
+            <Text style={styles.addVehicleSub}>Ekspertize başlamak için araç ekleyin</Text>
           </TouchableOpacity>
         )}
 
-        {/* İstatistikler */}
-        <View style={styles.section}>
-          <SectionTitle icon="chart-bar" title="Oturum Özeti" />
-          <View style={styles.statsGrid}>
-            <StatCard
-              icon="bluetooth-connect"
-              label="OBD2 Arıza"
-              value={dtcCodes.length.toString()}
-              color={dtcCodes.length > 0 ? COLORS.danger : COLORS.success}
-            />
-            <StatCard
-              icon="car-wrench"
-              label="Hasar Bölge"
-              value={damageAreas.length.toString()}
-              color={damageAreas.length > 0 ? COLORS.warning : COLORS.success}
-            />
-            <StatCard
-              icon="file-document-multiple"
-              label="Toplam Rapor"
-              value={reports.length.toString()}
-              color={COLORS.info}
-            />
+        {/* İlerleme */}
+        <View style={styles.progressCard}>
+          <View style={styles.progressHeader}>
+            <Text style={styles.progressTitle}>Test İlerlemesi</Text>
+            <Text style={styles.progressCount}>{doneCount}/{testModules.length}</Text>
           </View>
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, {width: `${(doneCount / testModules.length) * 100}%`}]} />
+          </View>
+          <Text style={styles.progressLabel}>
+            {doneCount === testModules.length ? '✅ Tüm testler tamamlandı — rapor oluşturabilirsiniz' :
+             doneCount === 0 ? 'Testlere başlamak için aşağıdaki kartlara tıklayın' :
+             `${testModules.length - doneCount} test daha kaldı`}
+          </Text>
+        </View>
+
+        {/* Test Modülleri */}
+        <Text style={styles.sectionTitle}>Ekspertiz Testleri</Text>
+        <View style={styles.testGrid}>
+          {testModules.map(m => (
+            <TouchableOpacity
+              key={m.key}
+              style={[styles.testCard, {borderTopColor: m.color}, m.done && styles.testCardDone]}
+              onPress={() => m.screen && navigation.navigate(m.screen as any)}
+              activeOpacity={0.8}
+              disabled={!m.screen}>
+              <View style={styles.testCardHeader}>
+                <View style={[styles.testIcon, {backgroundColor: m.color + '22'}]}>
+                  <Icon name={m.icon} size={22} color={m.color} />
+                </View>
+                {m.done ? (
+                  <View style={styles.doneBadge}>
+                    <Icon name="check-circle" size={14} color={COLORS.success} />
+                    <Text style={styles.doneText}>Tamam</Text>
+                  </View>
+                ) : m.screen ? (
+                  <Icon name="chevron-right" size={18} color={COLORS.textMuted} />
+                ) : (
+                  <View style={styles.tabBadge}>
+                    <Text style={styles.tabBadgeText}>OBD2 tab</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.testTitle}>{m.title}</Text>
+              <Text style={styles.testDesc}>{m.desc}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* Hızlı Eylemler */}
-        <View style={styles.section}>
-          <SectionTitle icon="lightning-bolt" title="Hızlı Eylemler" />
-          <View style={styles.actionsGrid}>
-            <ActionBtn
-              icon="bluetooth-connect"
-              label="OBD2 Bağlan"
-              color="#3498DB"
-              onPress={() => {/* navigate to OBD2 tab */}}
-            />
-            <ActionBtn
-              icon="camera"
-              label="Hasar Tespiti"
-              color="#9B59B6"
-              onPress={() => {/* navigate to Camera tab */}}
-            />
-            <ActionBtn
-              icon="refresh"
-              label="Yeni Oturum"
-              color="#E67E22"
-              onPress={resetSession}
-            />
-            <ActionBtn
-              icon="file-document"
-              label="Rapor Oluştur"
-              color="#27AE60"
-              onPress={() => {/* navigate to Report tab */}}
-            />
-          </View>
+        <View style={styles.quickActions}>
+          <TouchableOpacity
+            style={[styles.qaBtn, {backgroundColor: COLORS.primary}]}
+            onPress={() => navigation.navigate('Report' as any)}>
+            <Icon name="file-document-plus" size={20} color={COLORS.darkBg} />
+            <Text style={[styles.qaBtnText, {color: COLORS.darkBg}]}>Rapor Oluştur</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.qaBtn, {backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.danger + '66'}]}
+            onPress={resetSession}>
+            <Icon name="refresh" size={20} color={COLORS.danger} />
+            <Text style={[styles.qaBtnText, {color: COLORS.danger}]}>Sıfırla</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Son Raporlar */}
         {recentReports.length > 0 && (
           <View style={styles.section}>
-            <SectionTitle icon="history" title="Son Raporlar" />
-            {recentReports.map(report => (
-              <ReportRow key={report.id} report={report} />
-            ))}
+            <Text style={styles.sectionTitle}>Son Raporlar</Text>
+            {recentReports.map(r => <ReportRow key={r.id} report={r} />)}
           </View>
         )}
 
@@ -139,138 +202,61 @@ export default function HomeScreen() {
   );
 }
 
-// ── Alt bileşenler ─────────────────────────────────────────────────────────────
-
-function SectionTitle({icon, title}: {icon: string; title: string}) {
-  return (
-    <View style={sectionStyles.row}>
-      <Icon name={icon} size={18} color={COLORS.primary} />
-      <Text style={sectionStyles.title}>{title}</Text>
-    </View>
-  );
-}
-
-function StatCard({icon, label, value, color}: {icon: string; label: string; value: string; color: string}) {
-  return (
-    <View style={[statStyles.card, {borderTopColor: color}]}>
-      <Icon name={icon} size={22} color={color} />
-      <Text style={[statStyles.value, {color}]}>{value}</Text>
-      <Text style={statStyles.label}>{label}</Text>
-    </View>
-  );
-}
-
-function ActionBtn({icon, label, color, onPress}: {icon: string; label: string; color: string; onPress: () => void}) {
-  return (
-    <TouchableOpacity style={[actionStyles.btn, {borderColor: color + '44'}]} onPress={onPress} activeOpacity={0.8}>
-      <View style={[actionStyles.iconBg, {backgroundColor: color + '22'}]}>
-        <Icon name={icon} size={24} color={color} />
-      </View>
-      <Text style={actionStyles.label}>{label}</Text>
-    </TouchableOpacity>
-  );
-}
-
 function ReportRow({report}: {report: ExpertizReport}) {
-  const scoreColor = report.score.overall >= 80 ? COLORS.success
-    : report.score.overall >= 60 ? COLORS.warning : COLORS.danger;
-
   return (
-    <View style={reportStyles.row}>
-      <View style={reportStyles.info}>
-        <Text style={reportStyles.plate}>{report.vehicle.plate}</Text>
-        <Text style={reportStyles.name}>{report.vehicle.brand} {report.vehicle.model}</Text>
-        <Text style={reportStyles.date}>{formatDate(report.createdAt)}</Text>
+    <View style={repStyles.row}>
+      <View style={repStyles.info}>
+        <Text style={repStyles.plate}>{report.vehicle.plate}</Text>
+        <Text style={repStyles.name}>{report.vehicle.brand} {report.vehicle.model}</Text>
+        <Text style={repStyles.date}>{formatDate(report.createdAt)}</Text>
       </View>
       <ScoreGauge score={report.score.overall} size="small" showLabel={false} />
     </View>
   );
 }
 
-// ── Stiller ────────────────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
   safe: {flex: 1, backgroundColor: COLORS.background},
   scroll: {flex: 1},
-  content: {padding: 16, gap: 20, paddingBottom: 32},
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
+  content: {padding: 16, gap: 14, paddingBottom: 32},
+  header: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4},
   appName: {fontSize: 20, fontWeight: '900', color: COLORS.primary},
-  subtitle: {fontSize: 12, color: COLORS.textMuted, marginTop: 2},
-  logo: {padding: 8},
-  section: {gap: 10},
-  addVehicleBtn: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: COLORS.primary + '44',
-    borderStyle: 'dashed',
-    padding: 24,
-    alignItems: 'center',
-    gap: 8,
-  },
+  subtitle: {fontSize: 11, color: COLORS.textMuted, marginTop: 2},
+  addVehicleBtn: {backgroundColor: COLORS.cardBg, borderRadius: 12, borderWidth: 2, borderColor: COLORS.primary + '44', borderStyle: 'dashed', padding: 24, alignItems: 'center', gap: 8},
   addVehicleText: {fontSize: 16, fontWeight: '700', color: COLORS.primary},
   addVehicleSub: {fontSize: 12, color: COLORS.textMuted, textAlign: 'center'},
-  statsGrid: {flexDirection: 'row', gap: 10},
-  actionsGrid: {flexDirection: 'row', flexWrap: 'wrap', gap: 10},
-  footer: {alignItems: 'center', paddingTop: 10},
+  progressCard: {backgroundColor: COLORS.cardBg, borderRadius: 12, padding: 14, gap: 8, borderWidth: 1, borderColor: COLORS.border},
+  progressHeader: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
+  progressTitle: {fontSize: 14, fontWeight: '700', color: COLORS.textPrimary},
+  progressCount: {fontSize: 16, fontWeight: '900', color: COLORS.primary},
+  progressBar: {height: 8, backgroundColor: COLORS.border, borderRadius: 4, overflow: 'hidden'},
+  progressFill: {height: '100%', backgroundColor: COLORS.primary, borderRadius: 4},
+  progressLabel: {fontSize: 11, color: COLORS.textMuted},
+  sectionTitle: {fontSize: 15, fontWeight: '800', color: COLORS.textPrimary},
+  testGrid: {flexDirection: 'row', flexWrap: 'wrap', gap: 10},
+  testCard: {
+    width: '47%', backgroundColor: COLORS.cardBg, borderRadius: 12,
+    padding: 12, borderWidth: 1, borderColor: COLORS.border, borderTopWidth: 3, gap: 6,
+  },
+  testCardDone: {borderColor: COLORS.success + '44', backgroundColor: COLORS.success + '0A'},
+  testCardHeader: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
+  testIcon: {width: 40, height: 40, borderRadius: 10, justifyContent: 'center', alignItems: 'center'},
+  doneBadge: {flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: COLORS.success + '22', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8},
+  doneText: {fontSize: 10, color: COLORS.success, fontWeight: '700'},
+  tabBadge: {backgroundColor: COLORS.info + '22', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8},
+  tabBadgeText: {fontSize: 9, color: COLORS.info},
+  testTitle: {fontSize: 13, fontWeight: '700', color: COLORS.textPrimary},
+  testDesc: {fontSize: 11, color: COLORS.textMuted, lineHeight: 16},
+  quickActions: {flexDirection: 'row', gap: 10},
+  qaBtn: {flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 12},
+  qaBtnText: {fontSize: 14, fontWeight: '800'},
+  section: {gap: 8},
+  footer: {alignItems: 'center', paddingTop: 4},
   footerText: {fontSize: 11, color: COLORS.textMuted},
 });
 
-const sectionStyles = StyleSheet.create({
-  row: {flexDirection: 'row', alignItems: 'center', gap: 8},
-  title: {fontSize: 15, fontWeight: '700', color: COLORS.textPrimary},
-});
-
-const statStyles = StyleSheet.create({
-  card: {
-    flex: 1,
-    backgroundColor: COLORS.cardBg,
-    borderRadius: 10,
-    padding: 12,
-    alignItems: 'center',
-    gap: 4,
-    borderTopWidth: 3,
-  },
-  value: {fontSize: 24, fontWeight: '900'},
-  label: {fontSize: 11, color: COLORS.textMuted, textAlign: 'center'},
-});
-
-const actionStyles = StyleSheet.create({
-  btn: {
-    width: '47%',
-    backgroundColor: COLORS.cardBg,
-    borderRadius: 12,
-    padding: 14,
-    alignItems: 'center',
-    gap: 8,
-    borderWidth: 1,
-  },
-  iconBg: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  label: {fontSize: 12, fontWeight: '600', color: COLORS.textSecondary},
-});
-
-const reportStyles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: COLORS.cardBg,
-    borderRadius: 10,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
+const repStyles = StyleSheet.create({
+  row: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: COLORS.cardBg, borderRadius: 10, padding: 12, borderWidth: 1, borderColor: COLORS.border},
   info: {flex: 1, gap: 2},
   plate: {fontSize: 14, fontWeight: '700', color: COLORS.textPrimary},
   name: {fontSize: 12, color: COLORS.textSecondary},
